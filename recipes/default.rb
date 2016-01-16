@@ -5,6 +5,7 @@ jboss_group = node['jboss-eap']['jboss_group']
 
 # Create JBoss User
 user node['jboss-eap']['jboss_user'] do
+    group node['jboss-eap']['jboss_group']
     action :create
 end
 
@@ -27,16 +28,16 @@ end
 
 # Init script config dir
 directory node['jboss-eap']['config_dir'] do
-    owner node['jboss-eap']['jboss_user']
-    group node['jboss-eap']['jboss_group']
+    owner node['current_user'] == "root" ? "root" : node['jboss-eap']['jboss_user']
+    group node['current_user'] == "root" ? "root" : node['jboss-eap']['jboss_group']
     mode "0755"
 end
 
 # Init script config file
 template "#{node['jboss-eap']['config_dir']}/jboss-as.conf" do
   source    'jboss-as.conf.erb'
-  owner node['jboss-eap']['jboss_user']
-  group node['jboss-eap']['jboss_group']
+  owner node['current_user'] == "root" ? "root" : node['jboss-eap']['jboss_user']
+  group node['current_user'] == "root" ? "root" : node['jboss-eap']['jboss_group']
   mode "0644"
 end
 
@@ -46,7 +47,7 @@ cookbook_file "/etc/init.d/jboss" do
   mode "0755"
   owner "root"
   group "root"
-  ignore_failure true
+  only_if { node['current_user'] == "root" }
 end
 
 # Manage log directory
@@ -92,5 +93,7 @@ service "jboss" do
     else
         action :disable
     end
-    ignore_failure true
+    only_if { node['current_user'] == "root" }
 end
+
+#Chef::Log.info(node['current_user'])
