@@ -3,13 +3,13 @@ include_recipe "ark"
 jboss_user = node['jboss-eap']['jboss_user']
 jboss_group = node['jboss-eap']['jboss_group']
 
-# Create JBoss User
-user node['jboss-eap']['jboss_user'] do
-    group node['jboss-eap']['jboss_group']
+group node['jboss-eap']['jboss_group'] do
     action :create
 end
 
-group node['jboss-eap']['jboss_group'] do
+# Create JBoss User
+user node['jboss-eap']['jboss_user'] do
+    group node['jboss-eap']['jboss_group']
     action :create
 end
 
